@@ -3,11 +3,12 @@ package main
 
 import (
 	"fmt"
-	"gonnect"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/megascan/gonnect"
 )
 
 // HTML templates for the example

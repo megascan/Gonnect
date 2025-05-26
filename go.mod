@@ -1,4 +1,4 @@
-module gonnect
+module github.com/megascan/Gonnect
 
 go 1.24.2
 
