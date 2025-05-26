@@ -1,21 +1,22 @@
 package gonnect
 
 import (
-	"github.com/megascan/Gonnect/gonnect/internal/coretypes"
-	"github.com/megascan/Gonnect/gonnect/providers/amazon"
-	"github.com/megascan/Gonnect/gonnect/providers/apple"
-	"github.com/megascan/Gonnect/gonnect/providers/discord"
-	"github.com/megascan/Gonnect/gonnect/providers/dropbox"
-	"github.com/megascan/Gonnect/gonnect/providers/facebook"
-	"github.com/megascan/Gonnect/gonnect/providers/github"
-	"github.com/megascan/Gonnect/gonnect/providers/gitlab"
-	"github.com/megascan/Gonnect/gonnect/providers/google"
-	"github.com/megascan/Gonnect/gonnect/providers/linkedin"
-	"github.com/megascan/Gonnect/gonnect/providers/microsoft"
-	"github.com/megascan/Gonnect/gonnect/providers/steam"
-	"github.com/megascan/Gonnect/gonnect/providers/twitter"
-	"github.com/megascan/Gonnect/gonnect/providers/yahoo"
-	"github.com/megascan/Gonnect/gonnect/providers/yandex"
+	"gonnect/internal/coretypes"
+
+	"github.com/megascan/Gonnect/providers/amazon"
+	"github.com/megascan/Gonnect/providers/apple"
+	"github.com/megascan/Gonnect/providers/discord"
+	"github.com/megascan/Gonnect/providers/dropbox"
+	"github.com/megascan/Gonnect/providers/facebook"
+	"github.com/megascan/Gonnect/providers/github"
+	"github.com/megascan/Gonnect/providers/gitlab"
+	"github.com/megascan/Gonnect/providers/google"
+	"github.com/megascan/Gonnect/providers/linkedin"
+	"github.com/megascan/Gonnect/providers/microsoft"
+	"github.com/megascan/Gonnect/providers/steam"
+	"github.com/megascan/Gonnect/providers/twitter"
+	"github.com/megascan/Gonnect/providers/yahoo"
+	"github.com/megascan/Gonnect/providers/yandex"
 )
 
 // Google adds Google OAuth2 provider with method chaining
