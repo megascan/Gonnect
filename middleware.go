@@ -47,7 +47,7 @@ func (g *Gonnect) OptionalAuth(next http.Handler) http.Handler {
 
 // ValidateRequest validates a request and returns the authenticated user
 // It checks both JWT tokens (Authorization header) and session cookies
-func (g *Gonnect) ValidateRequest(r *http.Request) (*coretypes.User, error) {
+func (g *Gonnect) ValidateRequest(r *http.Request) (*User, error) {
 	// Try JWT first (for API clients)
 	if authHeader := r.Header.Get("Authorization"); authHeader != "" {
 		if strings.HasPrefix(authHeader, "Bearer ") {
@@ -57,7 +57,11 @@ func (g *Gonnect) ValidateRequest(r *http.Request) (*coretypes.User, error) {
 	}
 
 	// Fall back to session (for web clients)
-	return g.getUserFromSession(r)
+	internalUser, err := g.getUserFromSession(r)
+	if err != nil {
+		return nil, err
+	}
+	return convertInternalUserToExported(internalUser), nil
 }
 
 // JWT Implementation
@@ -123,7 +127,7 @@ func (g *Gonnect) generateJWT(user coretypes.User) (string, error) {
 }
 
 // validateJWT validates a JWT token and returns the user
-func (g *Gonnect) validateJWT(tokenString string) (*coretypes.User, error) {
+func (g *Gonnect) validateJWT(tokenString string) (*User, error) {
 	if g.jwtSecret == nil {
 		return nil, coretypes.NewError(coretypes.ErrTypeConfig, "JWT secret not configured")
 	}
@@ -160,7 +164,7 @@ func (g *Gonnect) validateJWT(tokenString string) (*coretypes.User, error) {
 	}
 
 	// Convert claims to User
-	user := &coretypes.User{
+	user := &User{
 		ID:        claims.UserID,
 		Email:     claims.Email,
 		Name:      claims.Name,
@@ -185,7 +189,7 @@ func (g *Gonnect) signJWT(message string) string {
 // getUser retrieves the authenticated user from the request (for middleware)
 func (g *Gonnect) getUser(r *http.Request) *coretypes.User {
 	user, _ := g.ValidateRequest(r)
-	return user
+	return convertExportedUserToInternal(user)
 }
 
 // isAuthenticated checks if the request has a valid authentication
@@ -198,33 +202,33 @@ func (g *Gonnect) isAuthenticated(r *http.Request) bool {
 
 // MemoryTokenStore implements TokenStore using in-memory storage
 type MemoryTokenStore struct {
-	tokens map[string]map[string]coretypes.Token // userID -> provider -> token
+	tokens map[string]map[string]Token // userID -> provider -> token
 }
 
 // NewMemoryTokenStore creates a new memory-based token store
 func NewMemoryTokenStore() *MemoryTokenStore {
 	return &MemoryTokenStore{
-		tokens: make(map[string]map[string]coretypes.Token),
+		tokens: make(map[string]map[string]Token),
 	}
 }
 
 // StoreToken stores a token for a user and provider
-func (m *MemoryTokenStore) StoreToken(ctx context.Context, userID string, provider string, token coretypes.Token) error {
+func (m *MemoryTokenStore) StoreToken(ctx context.Context, userID string, provider string, token Token) error {
 	if m.tokens[userID] == nil {
-		m.tokens[userID] = make(map[string]coretypes.Token)
+		m.tokens[userID] = make(map[string]Token)
 	}
 	m.tokens[userID][provider] = token
 	return nil
 }
 
 // GetToken retrieves a token for a user and provider
-func (m *MemoryTokenStore) GetToken(ctx context.Context, userID string, provider string) (coretypes.Token, error) {
+func (m *MemoryTokenStore) GetToken(ctx context.Context, userID string, provider string) (Token, error) {
 	if userTokens, exists := m.tokens[userID]; exists {
 		if token, exists := userTokens[provider]; exists {
 			return token, nil
 		}
 	}
-	return coretypes.Token{}, coretypes.NewError(coretypes.ErrTypeToken, "token not found")
+	return Token{}, NewError(ErrTypeToken, "token not found")
 }
 
 // DeleteToken removes a token for a user and provider
@@ -239,7 +243,7 @@ func (m *MemoryTokenStore) DeleteToken(ctx context.Context, userID string, provi
 }
 
 // RefreshToken refreshes a token for a user and provider
-func (m *MemoryTokenStore) RefreshToken(ctx context.Context, userID string, provider string) (coretypes.Token, error) {
+func (m *MemoryTokenStore) RefreshToken(ctx context.Context, userID string, provider string) (Token, error) {
 	// This would typically call the provider's refresh endpoint
 	// For now, just return the existing token
 	return m.GetToken(ctx, userID, provider)

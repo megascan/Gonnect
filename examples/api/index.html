@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gonnect API Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .auth-status {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .auth-status.authenticated {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .auth-status.not-authenticated {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .provider-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .user-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-right: 15px;
+            float: left;
+        }
+
+        .user-details {
+            overflow: hidden;
+        }
+
+        .user-details h3 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .user-details p {
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .api-response {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .success {
+            color: #155724;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .profile-form {
+            display: grid;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        @media (max-width: 600px) {
+            .provider-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Gonnect API Demo</h1>
+            <p>Interactive demonstration of the Gonnect OAuth API</p>
+        </div>
+
+        <div class="content">
+            <!-- Authentication Status -->
+            <div class="section">
+                <h2>🔍 Authentication Status</h2>
+                <div id="authStatus" class="auth-status not-authenticated">
+                    Checking authentication status...
+                </div>
+                <button class="btn btn-secondary" onclick="checkAuthStatus()">🔄 Refresh Status</button>
+            </div>
+
+            <!-- OAuth Providers -->
+            <div class="section">
+                <h2>🚀 OAuth Login</h2>
+                <p>Choose a provider to start the OAuth authentication flow:</p>
+                <div id="providerButtons" class="provider-buttons">
+                    Loading providers...
+                </div>
+            </div>
+
+            <!-- User Information -->
+            <div class="section" id="userSection" style="display: none;">
+                <h2>👤 User Information</h2>
+                <div id="userInfo" class="user-info">
+                    Loading user information...
+                </div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-success" onclick="getUserInfo()">🔄 Refresh User Info</button>
+                    <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+                </div>
+            </div>
+
+            <!-- User Profile Management -->
+            <div class="section" id="profileSection" style="display: none;">
+                <h2>⚙️ Profile Management</h2>
+                <button class="btn btn-primary" onclick="getUserProfile()">📋 Get Profile</button>
+                
+                <div class="profile-form">
+                    <div class="form-group">
+                        <label for="theme">Theme:</label>
+                        <select id="theme">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="notifications">Notifications:</label>
+                        <select id="notifications">
+                            <option value="true">Enabled</option>
+                            <option value="false">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="language">Language:</label>
+                        <select id="language">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success" onclick="updateProfile()">💾 Update Profile</button>
+                </div>
+            </div>
+
+            <!-- API Testing -->
+            <div class="section">
+                <h2>🧪 API Testing</h2>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-secondary" onclick="testHealthEndpoint()">❤️ Health Check</button>
+                    <button class="btn btn-secondary" onclick="testDocsEndpoint()">📚 API Docs</button>
+                </div>
+            </div>
+
+            <!-- API Response -->
+            <div class="section">
+                <h2>📡 Last API Response</h2>
+                <div id="apiResponse" class="api-response">
+                    No API calls made yet. Try clicking one of the buttons above!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'http://localhost:8080';
+        
+        // Global state
+        let isAuthenticated = false;
+        let currentUser = null;
+
+        // API Client
+        class GonnectAPI {
+            constructor(baseURL = API_BASE) {
+                this.baseURL = baseURL;
+            }
+
+            async request(endpoint, options = {}) {
+                const url = `${this.baseURL}${endpoint}`;
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers,
+                    },
+                    credentials: 'include', // Include cookies for session-based auth
+                    ...options,
+                };
+
+                try {
+                    showLoading(true);
+                    const response = await fetch(url, config);
+                    const data = await response.json();
+                    
+                    // Display the response
+                    displayAPIResponse(data, response.status);
+                    
+                    if (!data.success) {
+                        throw new Error(data.error || 'API request failed');
+                    }
+                    
+                    return data;
+                } catch (error) {
+                    displayAPIResponse({ error: error.message }, 500);
+                    throw error;
+                } finally {
+                    showLoading(false);
+                }
+            }
+
+            async getProviders() {
+                return this.request('/api/auth/providers');
+            }
+
+            async getAuthStatus() {
+                return this.request('/api/auth/status');
+            }
+
+            async getUser() {
+                return this.request('/api/user');
+            }
+
+            async getUserProfile() {
+                return this.request('/api/user/profile');
+            }
+
+            async updateProfile(data) {
+                return this.request('/api/user/profile', {
+                    method: 'PUT',
+                    body: JSON.stringify(data),
+                });
+            }
+
+            async logout() {
+                return this.request('/api/auth/logout', {
+                    method: 'POST',
+                });
+            }
+
+            async getHealth() {
+                return this.request('/api/health');
+            }
+
+            async getDocs() {
+                return this.request('/api/docs');
+            }
+
+            startOAuth(provider) {
+                window.location.href = `${this.baseURL}/auth/${provider}`;
+            }
+        }
+
+        const api = new GonnectAPI();
+
+        // Initialize the page
+        async function init() {
+            await loadProviders();
+            await checkAuthStatus();
+        }
+
+        // Load available OAuth providers
+        async function loadProviders() {
+            try {
+                const response = await api.getProviders();
+                const providers = response.data.providers;
+                
+                const container = document.getElementById('providerButtons');
+                container.innerHTML = '';
+                
+                Object.entries(providers).forEach(([name, url]) => {
+                    const button = document.createElement('button');
+                    button.className = 'btn btn-primary';
+                    button.textContent = `Login with ${name.charAt(0).toUpperCase() + name.slice(1)}`;
+                    button.onclick = () => api.startOAuth(name);
+                    container.appendChild(button);
+                });
+                
+                if (Object.keys(providers).length === 0) {
+                    container.innerHTML = '<p>No OAuth providers configured. Please check your environment variables.</p>';
+                }
+            } catch (error) {
+                document.getElementById('providerButtons').innerHTML = 
+                    `<div class="error">Failed to load providers: ${error.message}</div>`;
+            }
+        }
+
+        // Check authentication status
+        async function checkAuthStatus() {
+            try {
+                const response = await api.getAuthStatus();
+                const authData = response.data;
+                
+                isAuthenticated = authData.authenticated;
+                currentUser = authData.user;
+                
+                const statusElement = document.getElementById('authStatus');
+                const userSection = document.getElementById('userSection');
+                const profileSection = document.getElementById('profileSection');
+                
+                if (isAuthenticated) {
+                    statusElement.className = 'auth-status authenticated';
+                    statusElement.innerHTML = `
+                        ✅ Authenticated as <strong>${currentUser.name || currentUser.email}</strong>
+                        ${authData.expires_at ? `<br>Expires: ${new Date(authData.expires_at).toLocaleString()}` : ''}
+                    `;
+                    userSection.style.display = 'block';
+                    profileSection.style.display = 'block';
+                    
+                    // Auto-load user info
+                    await getUserInfo();
+                } else {
+                    statusElement.className = 'auth-status not-authenticated';
+                    statusElement.textContent = '❌ Not authenticated. Please login using one of the providers below.';
+                    userSection.style.display = 'none';
+                    profileSection.style.display = 'none';
+                }
+            } catch (error) {
+                const statusElement = document.getElementById('authStatus');
+                statusElement.className = 'auth-status not-authenticated';
+                statusElement.textContent = `❌ Error checking authentication: ${error.message}`;
+            }
+        }
+
+        // Get user information
+        async function getUserInfo() {
+            if (!isAuthenticated) return;
+            
+            try {
+                const response = await api.getUser();
+                const user = response.data;
+                
+                const userInfoElement = document.getElementById('userInfo');
+                userInfoElement.innerHTML = `
+                    ${user.avatar_url ? `<img src="${user.avatar_url}" alt="Avatar" class="user-avatar">` : ''}
+                    <div class="user-details">
+                        <h3>${user.name || 'No name provided'}</h3>
+                        <p><strong>Email:</strong> ${user.email || 'No email provided'}</p>
+                        <p><strong>ID:</strong> ${user.id}</p>
+                        ${user.username ? `<p><strong>Username:</strong> ${user.username}</p>` : ''}
+                        ${user.locale ? `<p><strong>Locale:</strong> ${user.locale}</p>` : ''}
+                    </div>
+                    <div style="clear: both;"></div>
+                `;
+            } catch (error) {
+                document.getElementById('userInfo').innerHTML = 
+                    `<div class="error">Failed to load user info: ${error.message}</div>`;
+            }
+        }
+
+        // Get user profile
+        async function getUserProfile() {
+            if (!isAuthenticated) return;
+            
+            try {
+                const response = await api.getUserProfile();
+                const profile = response.data;
+                
+                // Update form with current settings
+                if (profile.settings) {
+                    document.getElementById('theme').value = profile.settings.theme || 'light';
+                    document.getElementById('notifications').value = profile.settings.notifications || 'true';
+                    document.getElementById('language').value = profile.settings.language || 'en';
+                }
+                
+                showMessage('Profile loaded successfully!', 'success');
+            } catch (error) {
+                showMessage(`Failed to load profile: ${error.message}`, 'error');
+            }
+        }
+
+        // Update user profile
+        async function updateProfile() {
+            if (!isAuthenticated) return;
+            
+            const profileData = {
+                theme: document.getElementById('theme').value,
+                notifications: document.getElementById('notifications').value === 'true',
+                language: document.getElementById('language').value,
+            };
+            
+            try {
+                await api.updateProfile(profileData);
+                showMessage('Profile updated successfully!', 'success');
+            } catch (error) {
+                showMessage(`Failed to update profile: ${error.message}`, 'error');
+            }
+        }
+
+        // Logout
+        async function logout() {
+            try {
+                await api.logout();
+                isAuthenticated = false;
+                currentUser = null;
+                await checkAuthStatus();
+                showMessage('Logged out successfully!', 'success');
+            } catch (error) {
+                showMessage(`Logout failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test health endpoint
+        async function testHealthEndpoint() {
+            try {
+                await api.getHealth();
+                showMessage('Health check successful!', 'success');
+            } catch (error) {
+                showMessage(`Health check failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Test docs endpoint
+        async function testDocsEndpoint() {
+            try {
+                await api.getDocs();
+                showMessage('API documentation loaded!', 'success');
+            } catch (error) {
+                showMessage(`Failed to load docs: ${error.message}`, 'error');
+            }
+        }
+
+        // Utility functions
+        function displayAPIResponse(data, status) {
+            const element = document.getElementById('apiResponse');
+            const timestamp = new Date().toLocaleTimeString();
+            element.textContent = `[${timestamp}] HTTP ${status}\n${JSON.stringify(data, null, 2)}`;
+        }
+
+        function showLoading(loading) {
+            document.body.classList.toggle('loading', loading);
+        }
+
+        function showMessage(message, type) {
+            // Remove existing messages
+            const existingMessages = document.querySelectorAll('.success, .error');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Create new message
+            const messageElement = document.createElement('div');
+            messageElement.className = type;
+            messageElement.textContent = message;
+            
+            // Add to the first section
+            const firstSection = document.querySelector('.section');
+            firstSection.appendChild(messageElement);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                messageElement.remove();
+            }, 5000);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html> 

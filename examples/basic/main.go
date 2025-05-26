@@ -3,7 +3,6 @@ package main
 
 import (
 	"fmt"
-	"gonnect/internal/coretypes"
 	"html/template"
 	"log"
 	"net/http"
@@ -204,7 +203,7 @@ func main() {
 
 		// Show login page for non-authenticated users
 		data := struct {
-			User      *coretypes.User
+			User      *gonnect.User
 			Providers []string
 		}{
 			User:      user,
@@ -218,7 +217,7 @@ func main() {
 	http.Handle("/protected", auth.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user := gonnect.GetUser(r)
 		data := struct {
-			User *coretypes.User
+			User *gonnect.User
 		}{
 			User: user,
 		}

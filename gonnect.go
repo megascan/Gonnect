@@ -12,6 +12,28 @@ import (
 	"gonnect/internal/coretypes"
 )
 
+// User represents a generic user object returned by a provider
+type User struct {
+	ID        string                 `json:"id"`         // Unique identifier from the provider
+	Email     string                 `json:"email"`      // User's email address
+	Name      string                 `json:"name"`       // User's display name
+	Username  string                 `json:"username"`   // Username (may differ from name)
+	AvatarURL string                 `json:"avatar_url"` // URL to user's profile picture
+	Locale    string                 `json:"locale"`     // User's locale/language preference
+	RawData   map[string]interface{} `json:"raw_data"`   // Original data from provider
+}
+
+// Token represents the token data from a provider
+type Token struct {
+	AccessToken  string                 `json:"access_token"`  // OAuth2 access token
+	RefreshToken string                 `json:"refresh_token"` // OAuth2 refresh token
+	Expiry       time.Time              `json:"expiry"`        // Token expiration time
+	IDToken      string                 `json:"id_token"`      // OpenID Connect ID token
+	TokenType    string                 `json:"token_type"`    // Token type (usually "Bearer")
+	Scope        string                 `json:"scope"`         // Granted scopes
+	Extra        map[string]interface{} `json:"extra"`         // Provider-specific token data
+}
+
 // Config holds the common configuration for a provider
 type Config struct {
 	ClientID     string                 `json:"client_id"`     // OAuth2 client ID
@@ -46,10 +68,10 @@ type Session interface {
 
 // TokenStore defines the interface for persistent token storage
 type TokenStore interface {
-	StoreToken(ctx context.Context, userID string, provider string, token coretypes.Token) error
-	GetToken(ctx context.Context, userID string, provider string) (coretypes.Token, error)
+	StoreToken(ctx context.Context, userID string, provider string, token Token) error
+	GetToken(ctx context.Context, userID string, provider string) (Token, error)
 	DeleteToken(ctx context.Context, userID string, provider string) error
-	RefreshToken(ctx context.Context, userID string, provider string) (coretypes.Token, error)
+	RefreshToken(ctx context.Context, userID string, provider string) (Token, error)
 }
 
 // Logger defines the interface for logging within Gonnect
@@ -225,7 +247,73 @@ const userContextKey contextKey = "gonnect_user"
 
 // GetUser retrieves the authenticated user from the request context
 // This is typically populated by a middleware after successful authentication.
-func GetUser(r *http.Request) *coretypes.User {
-	user, _ := r.Context().Value(contextKey("user")).(*coretypes.User)
-	return user
+func GetUser(r *http.Request) *User {
+	if user, ok := r.Context().Value(userContextKey).(*User); ok {
+		return user
+	}
+	return nil
+}
+
+// convertInternalUserToExported converts internal User to exported User
+func convertInternalUserToExported(user *coretypes.User) *User {
+	if user == nil {
+		return nil
+	}
+	return &User{
+		ID:        user.ID,
+		Email:     user.Email,
+		Name:      user.Name,
+		Username:  user.Username,
+		AvatarURL: user.AvatarURL,
+		Locale:    user.Locale,
+		RawData:   user.RawData,
+	}
+}
+
+// convertExportedUserToInternal converts exported User to internal User
+func convertExportedUserToInternal(user *User) *coretypes.User {
+	if user == nil {
+		return nil
+	}
+	return &coretypes.User{
+		ID:        user.ID,
+		Email:     user.Email,
+		Name:      user.Name,
+		Username:  user.Username,
+		AvatarURL: user.AvatarURL,
+		Locale:    user.Locale,
+		RawData:   user.RawData,
+	}
+}
+
+// convertInternalTokenToExported converts internal Token to exported Token
+func convertInternalTokenToExported(token *coretypes.Token) *Token {
+	if token == nil {
+		return nil
+	}
+	return &Token{
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
+		IDToken:      token.IDToken,
+		TokenType:    token.TokenType,
+		Scope:        token.Scope,
+		Extra:        token.Extra,
+	}
+}
+
+// convertExportedTokenToInternal converts exported Token to internal Token
+func convertExportedTokenToInternal(token *Token) *coretypes.Token {
+	if token == nil {
+		return nil
+	}
+	return &coretypes.Token{
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
+		Expiry:       token.Expiry,
+		IDToken:      token.IDToken,
+		TokenType:    token.TokenType,
+		Scope:        token.Scope,
+		Extra:        token.Extra,
+	}
 }

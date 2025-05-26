@@ -472,7 +472,8 @@ func (g *Gonnect) createSession(w http.ResponseWriter, r *http.Request, user cor
 		session.Set("token_expiry", token.Expiry.Unix())
 	} else {
 		// Store token in dedicated token store
-		if err := g.tokenStore.StoreToken(r.Context(), user.ID, "", token); err != nil {
+		exportedToken := convertInternalTokenToExported(&token)
+		if err := g.tokenStore.StoreToken(r.Context(), user.ID, "", *exportedToken); err != nil {
 			// Log error but don't fail the session creation
 			if g.logger != nil {
 				g.logger.Warn("failed to store token", "error", err)
