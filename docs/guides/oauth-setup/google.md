@@ -113,7 +113,7 @@ package main
 
 import (
     "os"
-    "gonnect"
+    "github.com/megascan/Gonnect"
 )
 
 func main() {

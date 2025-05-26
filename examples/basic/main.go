@@ -3,12 +3,11 @@ package main
 
 import (
 	"fmt"
+	"gonnect"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
-
-	"gonnect"
 )
 
 // HTML templates for the example

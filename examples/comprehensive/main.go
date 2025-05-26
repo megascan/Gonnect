@@ -22,7 +22,7 @@ import (
 	"os"
 	"time"
 
-	"gonnect"
+	"github.com/megascan/gonnect"
 )
 
 // UserProfile represents extended user information

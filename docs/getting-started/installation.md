@@ -63,7 +63,7 @@ package main
 
 import (
     "fmt"
-    "gonnect"
+    "github.com/megascan/Gonnect"
 )
 
 func main() {
@@ -139,7 +139,7 @@ import (
     "os"
     
     "github.com/joho/godotenv"
-    "gonnect"
+    "github.com/megascan/Gonnect"
 )
 
 func main() {

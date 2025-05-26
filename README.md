@@ -56,7 +56,7 @@ import (
     "log"
     "net/http"
     
-    "gonnect"
+    "github.com/megascan/Gonnect"
 )
 
 func main() {
@@ -110,7 +110,7 @@ import (
     "log"
     "net/http"
     
-    "gonnect"
+    "github.com/megascan/Gonnect"
 )
 
 func main() {

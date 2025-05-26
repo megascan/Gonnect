@@ -30,7 +30,7 @@ curl -s http://localhost:8080/api/auth/status | grep -q "authenticated" && echo 
 
 # Test home page
 echo "🔍 Testing home page..."
-curl -s http://localhost:8080/ | grep -q "Gonnect" && echo "✅ Home page check passed" || echo "❌ Home page check failed"
+curl -s http://localhost:8080/ | grep -q "github.com/megascan/Gonnect" && echo "✅ Home page check passed" || echo "❌ Home page check failed"
 
 # Stop the server
 echo "🛑 Stopping server..."
