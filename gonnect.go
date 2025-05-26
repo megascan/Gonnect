@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"gonnect/internal/coretypes"
+	"github.com/megascan/gonnect/internal/coretypes"
 )
 
 // User represents a generic user object returned by a provider

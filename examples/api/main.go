@@ -13,12 +13,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"gonnect"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/megascan/gonnect"
 )
 
 // APIResponse represents a standard API response structure

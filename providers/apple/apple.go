@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"gonnect/internal/coretypes"
+	"github.com/megascan/gonnect/internal/coretypes"
 
 	"github.com/golang-jwt/jwt/v4"
 )

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"gonnect/internal/coretypes"
+	"github.com/megascan/gonnect/internal/coretypes"
 )
 
 // Provider implements the coretypes.Provider interface for Steam (OpenID)

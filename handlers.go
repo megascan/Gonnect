@@ -3,7 +3,7 @@ package gonnect
 import (
 	"encoding/json"
 	"fmt"
-	"gonnect/internal/coretypes"
+	"github.com/megascan/gonnect/internal/coretypes"
 	"net/http"
 	"strings"
 )

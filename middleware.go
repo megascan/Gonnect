@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"gonnect/internal/coretypes"
+	"github.com/megascan/gonnect/internal/coretypes"
 	"net/http"
 	"strings"
 	"time"

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"gonnect/internal/coretypes"
+	"github.com/megascan/gonnect/internal/coretypes"
 )
 
 // Note: Twitter API v1.1 (used in original example) is legacy.
